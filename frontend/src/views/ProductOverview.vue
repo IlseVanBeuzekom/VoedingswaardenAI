@@ -34,6 +34,23 @@
           :key="product.id"
           class="product-card"
         >
+          <div class="card-actions">
+            <button 
+              @click="editProduct(product.id)"
+              class="action-btn edit-btn"
+              title="Product bewerken"
+            >
+              ✏️
+            </button>
+            <button 
+              @click="deleteProduct(product.id)"
+              class="action-btn delete-btn"
+              title="Product verwijderen"
+            >
+              ❌
+            </button>
+          </div>
+
           <h3>{{ product.name }}</h3>
           <div class="serving-info">
             <span class="serving-size">Per {{ product.serving_size }}g</span>
@@ -69,6 +86,7 @@
   
   <script>
   import { onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
   import { useProductStore } from '../stores/productStore.js';
   import BaseButton from '../components/ui/BaseButton.vue';
   
@@ -79,6 +97,7 @@
     },
     setup() {
       const productStore = useProductStore();
+      const router = useRouter();
   
       onMounted(async () => {
         await productStore.fetchProducts();
@@ -88,10 +107,27 @@
         const per100g = product.getPer100g();
         return `${per100g.energy_kcal} kcal, ${per100g.fats}g vet, ${per100g.carbohydrates}g kh, ${per100g.proteins}g eiw`;
       };
+
+      const editProduct = (productId) => {
+        router.push(`/products/edit/${productId}`);
+      };
+
+      const deleteProduct = async (productId) => {
+        const product = productStore.products.find(p => p.id === productId);
+        if (confirm(`Weet je zeker dat je "${product?.name}" wilt verwijderen?`)) {
+          try {
+            await productStore.deleteProduct(productId);
+          } catch (error) {
+            console.error('Error deleting product:', error);
+          }
+        }
+      };
   
       return {
         productStore,
-        getPer100gDisplay
+        getPer100gDisplay,
+        editProduct,
+        deleteProduct
       };
     }
   }
@@ -102,6 +138,42 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 24px;
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .action-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+
+  .action-btn:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .edit-btn:hover {
+    border-color: #3b82f6;
+  }
+
+  .delete-btn:hover {
+    border-color: #ef4444;
   }
   
   .header {
@@ -144,6 +216,7 @@
     border-radius: 8px;
     padding: 20px;
     transition: box-shadow 0.2s ease;
+    position: relative;
   }
   
   .product-card:hover {

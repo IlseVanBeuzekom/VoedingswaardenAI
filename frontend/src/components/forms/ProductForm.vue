@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="handleSubmit" class="product-form">
-      <h2>Nieuw Product Toevoegen</h2>
+      <h2>{{ mode === 'edit' ? 'Product Bewerken' : 'Nieuw Product Toevoegen' }}</h2>
       
       <div class="form-group">
         <label for="name">Productnaam*</label>
@@ -118,7 +118,7 @@
           :disabled="!isFormValid || loading"
           variant="primary"
         >
-          {{ loading ? 'Bezig met opslaan...' : 'Product Toevoegen' }}
+        {{ loading ? 'Bezig met opslaan...' : (mode === 'edit' ? 'Product Bijwerken' : 'Product Toevoegen') }}
         </BaseButton>
         
         <BaseButton 
@@ -137,7 +137,7 @@
   </template>
   
   <script>
-  import { reactive, computed } from 'vue';
+  import { reactive, computed, watch } from 'vue';
   import BaseButton from '../ui/BaseButton.vue';
   import { Product } from '../../models/Product.js';
   
@@ -155,11 +155,26 @@
       error: {
         type: String,
         default: null
+      },
+      initialData: {
+        type: Object,
+        default: null
+      },
+      mode: {
+        type: String,
+        default: 'create',
+        validator: value => ['create', 'edit'].includes(value)
       }
     },
     setup(props, { emit }) {
       const form = reactive(new Product());
   
+      watch(() => props.initialData, (newData) => {
+        if (newData) {
+          Object.assign(form, newData)
+        }
+      }, {immediate: true });
+      
       const isFormValid = computed(() => {
         return form.name.trim().length > 0 &&
                form.serving_size > 0 &&

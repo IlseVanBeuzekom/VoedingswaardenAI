@@ -18,3 +18,20 @@ class ProductRepository:
     
     def get_product_by_id(self, product_id: int) -> Optional[ProductDB]:
         return self.db.query(ProductDB).filter(ProductDB.id == product_id).first()
+
+    def update_product(self, product_id: int, product_data: ProductCreate) -> Optional[ProductDB]:
+        db_product = self.get_product_by_id(product_id)
+        if db_product:
+            for key, value in product_data.dict().items():
+                setattr(db_product, key, value)
+            self.db.commit()
+            self.db.refresh(db_product)
+        return db_product
+    
+    def delete_product(self, product_id: int) -> bool:
+        db_product = self.get_product_by_id(product_id)
+        if db_product:
+            self.db.delete(db_product)
+            self.db.commit()
+            return True
+        return False
