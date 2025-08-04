@@ -11,7 +11,7 @@
           variant="primary"
           size="large"
         >
-          Voeg Ingredient Toe
+          Voeg Product Toe
         </BaseButton>
         
         <BaseButton 
