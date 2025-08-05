@@ -6,37 +6,52 @@
     </div>
 
     <div class="actions">
-      <BaseButton 
-        @click="$router.push('/products/add')"
-        variant="primary"
-        size="large"
-      >
-        Voeg Product Toe
-      </BaseButton>
-      
-      <BaseButton 
-        @click="$router.push('/recipes/add')"
-        variant="primary"
-        size="large"
-      >
-        Voeg Recept Toe
-      </BaseButton>
-      
-      <BaseButton 
-        @click="$router.push('/recipes')"
-        variant="secondary"
-        size="large"
-      >
-        Recept Overzicht
-      </BaseButton>
+      <div class="action-groups">
+      <div class="action-group">
+        <h2>Producten</h2>
+        <div class="group-buttons">
+          <BaseButton 
+            @click="$router.push('/products/add')"
+            variant="primary"
+            size="large"
+          >
+            Voeg Product Toe
+          </BaseButton>
+          
+          <BaseButton 
+            @click="$router.push('/products')"
+            variant="secondary"
+            size="large"
+          >
+            Product Overzicht
+          </BaseButton>
+        </div>
+      </div>
 
-      <BaseButton 
-        @click="$router.push('/products')"
-        variant="secondary"
-        size="large"
-      >
-        Product Overzicht
-      </BaseButton>
+      <div class="action-group">
+        <h2>Recepten</h2>
+        <div class="group-buttons">
+          <BaseButton 
+            @click="$router.push('/recipes/add')"
+            variant="primary"
+            size="large"
+          >
+            Voeg Recept Toe
+          </BaseButton>
+          
+          <BaseButton 
+            @click="$router.push('/recipes')"
+            variant="secondary"
+            size="large"
+          >
+            Recept Overzicht
+          </BaseButton>
+        </div>
+      </div>
+    </div>
+      
+
+      
     </div>
   </div>
 </template>
@@ -53,6 +68,9 @@ export default {
 </script>
 
 <style scoped>
+.recepten {
+  margin-left: 1em;
+}
 .home {
   max-width: 800px;
   margin: 0 auto;

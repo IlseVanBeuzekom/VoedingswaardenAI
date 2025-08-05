@@ -5,6 +5,7 @@ import ProductOverview from '../views/ProductOverview.vue';
 import ProductEdit from '../views/ProductEdit.vue';
 import RecipeAdd from '../views/RecipeAdd.vue';
 import RecipeOverview from '../views/RecipeOverview.vue';
+import RecipeEdit from '../views/RecipeEdit.vue';
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/recipes',
     name: 'RecipeOverview',
     component: RecipeOverview
+  },
+  {
+    path: '/recipes/edit/:id',
+    name: 'RecipeEdit',
+    component: RecipeEdit
   }
 ];
 

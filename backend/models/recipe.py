@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from typing import List
 from models.product import Base
+from models.product import ProductDB
 
 class RecipeDB(Base):
     __tablename__ = "recipes"
