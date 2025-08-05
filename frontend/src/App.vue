@@ -8,6 +8,7 @@
         <div class="nav-links">
           <router-link to="/" class="nav-link">Home</router-link>
           <router-link to="/products" class="nav-link">Producten</router-link>
+          <router-link to="/recipes" class="nav-link">Recepten</router-link>
         </div>
       </nav>
   
@@ -72,7 +73,7 @@
   
   .nav-link:hover,
   .nav-link.router-link-active {
-    color: #3b82f6;
+    color: rgb(61, 9, 251);
   }
   
   .main-content {

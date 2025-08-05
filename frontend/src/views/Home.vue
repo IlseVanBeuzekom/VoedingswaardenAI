@@ -23,6 +23,14 @@
       </BaseButton>
       
       <BaseButton 
+        @click="$router.push('/recipes')"
+        variant="secondary"
+        size="large"
+      >
+        Recept Overzicht
+      </BaseButton>
+
+      <BaseButton 
         @click="$router.push('/products')"
         variant="secondary"
         size="large"

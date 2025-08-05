@@ -66,7 +66,7 @@
                     class="amount-input"
                   />
                   
-                  <select v-model="ingredient.unit" class="unit-select">
+                  <select v-model="ingredient.unit" aria-label='unit' class="unit-select">
                     <option value="gram">gram</option>
                     <option value="kg">kg</option>
                     <option value="ml">ml</option>
@@ -79,6 +79,7 @@
   
                   <select 
                     v-model="ingredient.product_id" 
+                    aria-label = "product"
                     class="product-select"
                     required
                   >
@@ -198,7 +199,7 @@
         
         try {
           await recipeStore.createRecipe(recipe.value.toAPI());
-          router.push('/');
+          router.push('/recipes');
         } catch (error) {
           console.error('Error creating recipe:', error);
         }
