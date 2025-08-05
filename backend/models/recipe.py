@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
-from typing import List, Optional
-from models.product import Base, ProductDB
+from typing import List
+from models.product import Base
 
 class RecipeDB(Base):
     __tablename__ = "recipes"
