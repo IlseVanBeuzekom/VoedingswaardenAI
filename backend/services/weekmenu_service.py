@@ -38,6 +38,8 @@ class WeekMenuService:
                 'id': day.id,
                 'date': day.date,
                 'recipe_id': day.recipe_id,
+                'servings': day.servings,
+                'add_to_shopping_list': day.add_to_shopping_list,
                 'recipe': None
             }
             

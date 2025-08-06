@@ -22,6 +22,8 @@
             :key="dayDate"
             :date="dayDate"
             :selectedRecipeId="getSelectedRecipeId(dayDate)"
+            :customServings="getCustomServings(dayDate)"
+            :addToShoppingList="getAddToShoppingList(dayDate)"
             :availableRecipes="availableRecipes"
             @recipeChange="onRecipeChange"
           />
@@ -92,6 +94,7 @@
       });
   
       const onDateRangeChange = async (range) => {
+        console.log('range: ', range)
         selectedStartDate.value = range.startDate;
         selectedEndDate.value = range.endDate;
         dayCount.value = range.dayCount;
@@ -102,40 +105,56 @@
             range.startDate, 
             range.endDate
           );
-          
-          if (existingMenu) {
+
+          // Check on id, because an empty one will be given back when there is no page for the week menu
+          if (existingMenu.id) {
             currentWeekMenu.value = existingMenu;
           } else {
-            // Create new week menu structure
-            currentWeekMenu.value = new WeekMenu({
-              start_date: range.startDate,
-              end_date: range.endDate,
-              days: dayDates.value.map(date => new MenuDay({ date }))
-            });
+            createNewWeekMenu(range);
           }
         } catch (error) {
-          // Create new if not found
-          currentWeekMenu.value = new WeekMenu({
-            start_date: range.startDate,
-            end_date: range.endDate,
-            days: dayDates.value.map(date => new MenuDay({ date }))
-          });
+          createNewWeekMenu(range);
         }
+      };
+      
+      const createNewWeekMenu = (range) => {
+        currentWeekMenu.value = new WeekMenu({
+          start_date: range.startDate,
+          end_date: range.endDate,
+          days: dayDates.value.map(date => new MenuDay({ 
+            date,
+            add_to_shopping_list: true 
+          }))
+        });
       };
   
       const getSelectedRecipeId = (dateStr) => {
         const day = currentWeekMenu.value.getDayByDate(dateStr);
         return day?.recipe_id || null;
       };
+
+      const getCustomServings = (dateStr) => {
+        const day = currentWeekMenu.value.getDayByDate(dateStr);
+        return day?.servings || null;
+      }
+
+      const getAddToShoppingList = (dateStr) => {
+        const day = currentWeekMenu.value.getDayByDate(dateStr);
+        return day?.add_to_shopping_list !== undefined ? day.add_to_shopping_list : true;
+      }
   
       const onRecipeChange = (changeData) => {
         const day = currentWeekMenu.value.getDayByDate(changeData.date);
         if (day) {
           day.recipe_id = changeData.recipeId;
+          day.servings = changeData.servings;
+          day.add_to_shopping_list = changeData.addToShoppingList;
         } else {
           currentWeekMenu.value.addDay({
             date: changeData.date,
-            recipe_id: changeData.recipeId
+            recipe_id: changeData.recipeId,
+            servings: changeData.servings,
+            add_to_shopping_list: changeData.addToShoppingList
           });
         }
       };
@@ -173,7 +192,10 @@
         availableRecipes,
         dayDates,
         onDateRangeChange,
+        createNewWeekMenu,
         getSelectedRecipeId,
+        getCustomServings,
+        getAddToShoppingList,
         onRecipeChange,
         saveWeekMenu
       };

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, ForeignKey
+from sqlalchemy import Column, Integer, Date, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -23,6 +23,8 @@ class MenuDayDB(Base):
     week_menu_id = Column(Integer, ForeignKey("week_menus.id"), nullable=False)
     date = Column(Date, nullable=False)
     recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=True)
+    servings = Column(Integer, nullable=False)
+    add_to_shopping_list = Column(Boolean, nullable=False, default=True)
     
     # Relationships
     week_menu = relationship("WeekMenuDB", back_populates="days")
@@ -32,6 +34,8 @@ class MenuDayDB(Base):
 class MenuDayBase(BaseModel):
     date: date
     recipe_id: Optional[int] = None
+    servings: Optional[int] = None
+    add_to_shopping_list: bool = True
 
 class MenuDayCreate(MenuDayBase):
     pass

@@ -37,6 +37,8 @@ export class WeekMenu {
       this.date = data.date || '';
       this.recipe_id = data.recipe_id || null;
       this.recipe = data.recipe || null;
+      this.servings = data.servings || null;
+      this.add_to_shopping_list = data.add_to_shopping_list !== undefined ? data.add_to_shopping_list : true;
     }
   
     static fromAPI(apiData) {
@@ -46,7 +48,9 @@ export class WeekMenu {
     toAPI() {
       return {
         date: this.date,
-        recipe_id: this.recipe_id
+        recipe_id: this.recipe_id,
+        servings: this.servings,
+        add_to_shopping_list: this.add_to_shopping_list
       };
     }
   }

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
@@ -38,7 +38,7 @@ async def get_week_menu_by_date_range(
 ):
     menu = weekmenu_service.get_week_menu_by_date_range(start_date, end_date)
     if not menu:
-        raise HTTPException(status_code=404, detail="Week menu not found")
+        return Response(status_code=status.HTTP_204_NO_CONTENT) #raise HTTPException(status_code=404, detail="Week menu not found")
     return menu
 
 @router.get("/{menu_id}", response_model=WeekMenuResponse)

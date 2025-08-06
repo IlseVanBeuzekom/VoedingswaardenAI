@@ -5,8 +5,9 @@
       <span class="date-display">{{ formatDate(date) }}</span>
     </div>
     
-    <div class="recipe-selector">
+    <div class="recipe-controls">
       <select 
+        aria-label="Recept"
         v-model="selectedRecipeId" 
         class="recipe-select"
         @change="onRecipeChange"
@@ -21,12 +22,37 @@
         </option>
       </select>
       
-      <div v-if="selectedRecipe" class="selected-recipe-info">
-        <span class="recipe-name">{{ selectedRecipe.name }}</span>
-        <div class="recipe-meta">
-          <span>👥 {{ selectedRecipe.servings }} personen</span>
-          <span>⏱️ {{ selectedRecipe.preparation_time }} min</span>
+      <div v-if="selectedRecipe" class="recipe-options">
+        <div class="servings-control">
+          <label for="servings">Personen:</label>
+          <input
+            id="servings"
+            v-model.number="customServings"
+            type="number"
+            min="1"
+            max="20"
+            class="servings-input"
+            @change="onOptionsChange"
+          />
         </div>
+        
+        <div class="shopping-list-control">
+          <label class="checkbox-label">
+            <input
+              v-model="addToShoppingList"
+              type="checkbox"
+              @change="onOptionsChange"
+            />
+            Boodschappenlijst
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="selectedRecipe" class="selected-recipe-info">
+      <span class="recipe-name">{{ selectedRecipe.name }}</span>
+      <div class="recipe-meta">
+        <span>⏱️ {{ selectedRecipe.preparation_time }} min</span>
       </div>
     </div>
   </div>
@@ -47,6 +73,14 @@
         type: [Number, String],
         default: null
       },
+      customServings: {
+        type: Number,
+        default: null
+      },
+      addToShoppingList: {
+        type: Boolean,
+        default: true
+      },
       availableRecipes: {
         type: Array,
         default: () => []
@@ -54,7 +88,9 @@
     },
     setup(props, { emit }) {
       const selectedRecipeId = ref(props.selectedRecipeId || '');
-  
+      const customServings = ref(props.customServings);
+      const addToShoppingList = ref(props.addToShoppingList);
+
       const selectedRecipe = computed(() => {
         if (!selectedRecipeId.value) return null;
         return props.availableRecipes.find(r => r.id == selectedRecipeId.value);
@@ -74,23 +110,50 @@
       };
   
       const onRecipeChange = () => {
+        if(selectedRecipeId.value){
+          customServings.value = selectedRecipe.value?.servings || null;
+        } else {
+          customServings.value = null
+        }
+
+        emitChange()
+      };
+
+      const onOptionsChange = () => {
+        emitChange()
+      }
+
+      const emitChange = () => {
         emit('recipeChange', {
           date: props.date,
-          recipeId: selectedRecipeId.value || null
-        });
+          recipeId: selectedRecipeId.value || null,
+          servings: customServings.value,
+          addToShoppingList: addToShoppingList.value
+        })
       };
   
       // Watch for prop changes
       watch(() => props.selectedRecipeId, (newVal) => {
         selectedRecipeId.value = newVal || '';
       });
+
+      watch(() => props.customServings, (newVal) => {
+        customServings.value = newVal;
+      });
+
+      watch(() => props.addToShoppingList, (newVal) => {
+        addToShoppingList.value = newVal;
+      })
   
       return {
         selectedRecipeId,
+        customServings,
+        addToShoppingList,
         selectedRecipe,
         formatDayName,
         formatDate,
-        onRecipeChange
+        onRecipeChange,
+        onOptionsChange
       };
     }
   }
@@ -103,11 +166,12 @@
     border-radius: 8px;
     padding: 20px;
     transition: box-shadow 0.2s ease;
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
     gap: 24px;
+    align-items: start;
   }
   
   .menu-day-selector:hover {
@@ -131,9 +195,16 @@
     color: #6b7280;
     font-size: 14px;
   }
+
+  .recipe-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
   
   .recipe-select {
-    width: 100%;
+    flex: 1;
+    min-width: 250px;
     padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
@@ -148,10 +219,8 @@
   }
   
   .selected-recipe-info {
-    margin-top: 8px;
-    padding: 8px 12px;
-    background-color: #f0f9ff;
-    border-radius: 6px;
+    text-align: right;
+    min-width: 120px;
   }
   
   .recipe-name {
@@ -159,11 +228,10 @@
     font-weight: 500;
     color: #1f2937;
     margin-bottom: 4px;
+    font-size: 14px;
   }
   
   .recipe-meta {
-    display: flex;
-    gap: 12px;
     font-size: 12px;
     color: #6b7280;
   }
@@ -173,7 +241,6 @@
   }
 
   .day-info {
-    min-width: 140px;
     text-align: left;
   }
 
@@ -184,4 +251,78 @@
     text-transform: capitalize;
     font-weight: 600;
   }
+
+  .recipe-options {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    white-space: nowrap;
+  }
+
+  .servings-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .servings-control label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .servings-input {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .servings-note {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .shopping-list-control {
+    display: flex;
+    align-items: center;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    margin: 0;
+  }
+
+  .checkmark {
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+  .menu-day-selector {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .recipe-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .recipe-options {
+    justify-content: space-between;
+  }
+  
+  .selected-recipe-info {
+    text-align: left;
+  }
+}
   </style>
