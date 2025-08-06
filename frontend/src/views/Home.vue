@@ -48,6 +48,19 @@
           </BaseButton>
         </div>
       </div>
+
+      <div class="action-group">
+        <h2>Weekmenu</h2>
+        <div class="group-buttons">
+          <BaseButton 
+            @click="$router.push('/weekmenu')"
+            variant="primary"
+            size="large"
+          >
+            Plan Weekmenu
+          </BaseButton>
+        </div>
+      </div>
     </div>
       
 
@@ -68,6 +81,31 @@ export default {
 </script>
 
 <style scoped>
+.action-groups {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.action-group h2 {
+  color: #1f2937;
+  margin: 0;
+}
+
+.group-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .recepten {
   margin-left: 1em;
 }

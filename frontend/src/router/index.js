@@ -6,6 +6,7 @@ import ProductEdit from '../views/ProductEdit.vue';
 import RecipeAdd from '../views/RecipeAdd.vue';
 import RecipeOverview from '../views/RecipeOverview.vue';
 import RecipeEdit from '../views/RecipeEdit.vue';
+import WeekMenu from '../views/WeekMenu.vue';
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
     path: '/recipes/edit/:id',
     name: 'RecipeEdit',
     component: RecipeEdit
+  },
+  {
+    path: '/weekmenu',
+    name: 'WeekMenu',
+    component: WeekMenu
   }
 ];
 
