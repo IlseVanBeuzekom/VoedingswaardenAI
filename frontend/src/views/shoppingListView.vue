@@ -54,6 +54,14 @@
             >
               Alles aan
             </BaseButton>
+            <BaseButton 
+              @click="shoppingStore.exportToTxt"
+              variant="primary"
+              size="small"
+              :disabled="shoppingStore.uncheckedItems.length === 0"
+            >
+              📄 Exporteer
+            </BaseButton>
           </div>
         </div>
   
@@ -69,6 +77,9 @@
                 :key="`${item.product_id}_${item.unit}`"
                 :item="item"
                 @toggle="shoppingStore.toggleItem"
+                @remove="shoppingStore.removeItem"
+                @updateAmount="shoppingStore.updateItemAmount"
+                @updateUnit="shoppingStore.updateItemUnit"
               />
             </div>
           </div>
@@ -82,6 +93,9 @@
                 :key="`${item.product_id}_${item.unit}`"
                 :item="item"
                 @toggle="shoppingStore.toggleItem"
+                @remove="shoppingStore.removeItem"
+                @updateAmount="shoppingStore.updateItemAmount"
+                @updateUnit="shoppingStore.updateItemUnit"
               />
             </div>
           </div>

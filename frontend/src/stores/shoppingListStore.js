@@ -90,6 +90,32 @@ export const useShoppingListStore = defineStore('shoppingList', {
         ...itemData,
         product_id: customId
       });
+    },
+
+    exportToTxt() {
+      const uncheckedItems = this.items.filter(item => !item.checked);
+      
+      if (uncheckedItems.length === 0) {
+        return 'Geen items om te exporteren.';
+      }
+    
+      let content = `Boodschappenlijst\n`;
+      content += `Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}\n\n`;
+      
+      uncheckedItems.forEach(item => {
+        content += `- ${item.amount} ${item.unit} ${item.product_name}\n`;
+      });
+      
+      // Download bestand
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `boodschappenlijst-${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   }
 });
