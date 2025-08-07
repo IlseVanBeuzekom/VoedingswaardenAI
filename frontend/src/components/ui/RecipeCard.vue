@@ -50,11 +50,15 @@
         <h4>Bereiding</h4>
         <p>{{ truncatedInstructions }}</p>
       </div>
+
+      <NutritionSummary :nutritionData="recipeNutrition" />
     </div>
   </template>
   
   <script>
   import { computed } from 'vue';
+  import NutritionSummary from './NutritionSummary.vue';
+  import recipeService from '../../services/recipeService.js';
   
   export default {
     name: 'RecipeCard',
@@ -65,6 +69,9 @@
         required: true
       }
     },
+    components: {
+      NutritionSummary
+    },
     setup(props) {
       const truncatedInstructions = computed(() => {
         const maxLength = 120;
@@ -73,9 +80,14 @@
         }
         return props.recipe.instructions.substring(0, maxLength) + '...';
       });
+
+      const recipeNutrition = computed(() => {
+        return recipeService.calculateNutrition(props.recipe);
+      });
   
       return {
-        truncatedInstructions
+        truncatedInstructions,
+        recipeNutrition
       };
     }
   }

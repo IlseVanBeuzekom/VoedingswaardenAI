@@ -125,6 +125,11 @@
             ></textarea>
           </div>
         </div>
+
+        <NutritionSummary 
+          v-if="form.ingredients.length > 0" 
+          :nutritionData="recipeNutrition" 
+        />
   
         <!-- Submit Button -->
         <div class="form-actions">
@@ -157,11 +162,14 @@
   import { useProductStore } from '../../stores/productStore.js';
   import { Recipe } from '../../models/Recipe.js';
   import BaseButton from '../ui/BaseButton.vue';
+  import NutritionSummary from '../ui/NutritionSummary.vue';
+  import recipeService from '../../services/recipeService.js';
   
   export default {
     name: 'RecipeForm',
     components: {
-      BaseButton
+      BaseButton,
+      NutritionSummary
     },
     emits: ['submit', 'cancel'],
     props: {
@@ -222,6 +230,18 @@
           emit('submit', form.toAPI());
         }
       };
+
+      const recipeNutrition = computed(() => {
+        // Create a temporary recipe object with current form data
+        const tempRecipe = {
+          ...form,
+          ingredients: form.ingredients.map(ing => ({
+            ...ing,
+            product: availableProducts.value.find(p => p.id === ing.product_id)
+          }))
+        };
+        return recipeService.calculateNutrition(tempRecipe);
+      });
   
       // Load products on mount
       onMounted(async () => {
@@ -242,7 +262,8 @@
         isFormValid,
         addIngredient,
         removeIngredient,
-        handleSubmit
+        handleSubmit,
+        recipeNutrition
       };
     }
   }
