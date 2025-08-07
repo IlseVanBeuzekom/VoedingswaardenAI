@@ -37,6 +37,14 @@
           >
             {{ weekMenuStore.loading ? 'Bezig met opslaan...' : 'Weekmenu Opslaan' }}
           </BaseButton>
+
+          <BaseButton 
+            v-if="showShoppingListButton"
+            @click="goToShoppingList"
+            variant="secondary"
+          >
+            📋 Boodschappenlijst
+          </BaseButton>
         </div>
       </div>
   
@@ -107,7 +115,7 @@
           );
 
           // Check on id, because an empty one will be given back when there is no page for the week menu
-          if (existingMenu.id) {
+          if (existingMenu && existingMenu.id) {
             currentWeekMenu.value = existingMenu;
           } else {
             createNewWeekMenu(range);
@@ -127,6 +135,10 @@
           }))
         });
       };
+
+      const showShoppingListButton = computed(() => {
+        return currentWeekMenu.value && currentWeekMenu.value.id;
+      });
   
       const getSelectedRecipeId = (dateStr) => {
         const day = currentWeekMenu.value.getDayByDate(dateStr);
@@ -162,7 +174,8 @@
       const saveWeekMenu = async () => {
         try {
           if (currentWeekMenu.value.id) {
-            await weekMenuStore.updateWeekMenu(currentWeekMenu.value.id, currentWeekMenu.value.toAPI());
+            const updatedMenu = await weekMenuStore.updateWeekMenu(currentWeekMenu.value.id, currentWeekMenu.value.toAPI());
+            currentWeekMenu.value = updatedMenu;
           } else {
             const newMenu = await weekMenuStore.createWeekMenu(currentWeekMenu.value.toAPI());
             currentWeekMenu.value = newMenu;
@@ -175,6 +188,12 @@
         }
       };
   
+      const goToShoppingList = () => {
+        if (currentWeekMenu.value && currentWeekMenu.value.id) {
+          router.push(`/shopping-list/${currentWeekMenu.value.id}`);
+        }
+      };
+
       // Load recipes on mount
       onMounted(async () => {
         try {
@@ -197,7 +216,9 @@
         getCustomServings,
         getAddToShoppingList,
         onRecipeChange,
-        saveWeekMenu
+        saveWeekMenu,
+        goToShoppingList,
+        showShoppingListButton
       };
     }
   }

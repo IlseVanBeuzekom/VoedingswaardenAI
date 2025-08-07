@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.product_routes import router as product_router
 from routes.recipe_routes import router as recipe_router
 from routes.weekmenu_routes import router as weekmenu_router
+from routes.shopping_list_routes import router as shopping_list_router
 from models.product import Base as ProductBase
 from models.recipe import Base as RecipeBase
 from models.weekmenu import Base as WeekMenuBase
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(product_router)
 app.include_router(recipe_router)
 app.include_router(weekmenu_router)
+app.include_router(shopping_list_router)
 
 @app.get("/")
 async def root():
