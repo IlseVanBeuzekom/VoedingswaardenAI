@@ -57,6 +57,39 @@ export const useShoppingListStore = defineStore('shoppingList', {
       this.items = [];
       this.currentMenuId = null;
       this.error = null;
+    },
+
+    updateItemAmount(item, newAmount) {
+      const index = this.items.findIndex(i => 
+        i.product_id === item.product_id && i.unit === item.unit && i.product_name === item.product_name
+      );
+      if (index !== -1) {
+        this.items[index].amount = newAmount;
+      }
+    },
+    
+    updateItemUnit(item, newUnit) {
+      const index = this.items.findIndex(i => 
+        i.product_id === item.product_id && i.unit === item.unit && i.product_name === item.product_name
+      );
+      if (index !== -1) {
+        this.items[index].unit = newUnit;
+      }
+    },
+    
+    removeItem(item) {
+      this.items = this.items.filter(i => 
+        !(i.product_id === item.product_id && i.unit === item.unit && i.product_name === item.product_name)
+      );
+    },
+    
+    addCustomItem(itemData) {
+      // Generate unique product_id for custom items
+      const customId = `custom_${Date.now()}`;
+      this.items.push({
+        ...itemData,
+        product_id: customId
+      });
     }
   }
 });

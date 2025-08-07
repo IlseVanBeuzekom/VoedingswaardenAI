@@ -57,6 +57,8 @@
           </div>
         </div>
   
+        <AddItemForm @addItem="shoppingStore.addCustomItem" />
+
         <div class="shopping-sections">
           <!-- Unchecked items -->
           <div v-if="shoppingStore.uncheckedItems.length > 0" class="section">
@@ -94,12 +96,14 @@
   import { useShoppingListStore } from '../stores/shoppingListStore.js';
   import ShoppingListItem from '../components/ui/ShoppingListItem.vue';
   import BaseButton from '../components/ui/BaseButton.vue';
+  import AddItemForm from '../components/ui/AddItemForm.vue'
   
   export default {
     name: 'ShoppingList',
     components: {
       ShoppingListItem,
-      BaseButton
+      BaseButton,
+      AddItemForm
     },
     setup() {
       const route = useRoute();

@@ -1,147 +1,143 @@
 <template>
-    <div class="shopping-item" :class="{ 'checked': item.checked }">
-      <label class="item-checkbox">
+  <div class="shopping-item" :class="{ 'checked': item.checked }">
+    
+    
+    <div class="item-details">
+      
+      <div class="item-amount-control">
+        <label class="item-checkbox">
         <input
           v-model="item.checked"
           type="checkbox"
           @change="$emit('toggle', item)"
         />
         <span class="checkmark"></span>
-      </label>
-      
-      <div class="item-details">
-        <span class="item-amount">{{ formatAmount(item.amount) }} {{ item.unit }}</span>
+        </label>
+        <input
+          v-model.number="localAmount"
+          type="number"
+          step="0.1"
+          min="0.1"
+          class="amount-input"
+          @blur="updateAmount"
+          @keyup.enter="updateAmount"
+        />
+        <select v-model="localUnit" @change="updateUnit" class="unit-select">
+          <option value="gram">gram</option>
+          <option value="kg">kg</option>
+          <option value="ml">ml</option>
+          <option value="liter">liter</option>
+          <option value="stuk">stuk</option>
+          <option value="el">eetlepel</option>
+          <option value="tl">theelepel</option>
+          <option value="kopje">kopje</option>
+        </select>
+
         <span class="item-name">{{ item.product_name }}</span>
+
+        <button 
+          @click="$emit('remove', item)"
+          class="remove-btn"
+          title="Verwijder item"
+        >
+          ❌
+        </button>
       </div>
+      
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'ShoppingListItem',
-    emits: ['toggle'],
-    props: {
-      item: {
-        type: Object,
-        required: true
-      }
-    },
-    setup() {
-      const formatAmount = (amount) => {
-        // Round to 1 decimal place and remove trailing zeros
-        return parseFloat(amount.toFixed(1));
-      };
-  
-      return {
-        formatAmount
-      };
-    }
-  }
-  </script>
-  
-  <style scoped>
-  .shopping-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-  
-  .shopping-item:hover {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .shopping-item.checked {
-    background-color: #f9fafb;
-    opacity: 0.7;
-  }
-  
-  .shopping-item.checked .item-name {
-    text-decoration: line-through;
-    color: #6b7280;
-  }
-  
-  .item-checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .item-checkbox input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-  }
-  
-  .checkmark {
-    height: 20px;
-    width: 20px;
-    background-color: #fff;
-    border: 2px solid #d1d5db;
-    border-radius: 4px;
-    position: relative;
-    transition: all 0.2s ease;
-  }
-  
-  .item-checkbox:hover input ~ .checkmark {
-    border-color: #3b82f6;
-  }
-  
-  .item-checkbox input:checked ~ .checkmark {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-  }
-  
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-  
-  .item-checkbox input:checked ~ .checkmark:after {
-    display: block;
-  }
-  
-  .item-checkbox .checkmark:after {
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-  }
-  
-  .item-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-  }
-  
-  .item-amount {
-    font-size: 14px;
-    color: #6b7280;
-    font-weight: 500;
-  }
-  
-  .item-name {
-    font-size: 16px;
-    color: #1f2937;
-    font-weight: 500;
-  }
-  
-  @media (max-width: 768px) {
-    .shopping-item {
-      padding: 10px 12px;
-    }
+
     
-    .item-details {
-      gap: 0;
+  </div>
+</template>
+
+<script>
+import { ref, watch } from 'vue';
+
+export default {
+  name: 'ShoppingListItem',
+  emits: ['toggle', 'updateAmount', 'updateUnit', 'remove'],
+  props: {
+    item: {
+      type: Object,
+      required: true
     }
+  },
+  setup(props, { emit }) {
+    const localAmount = ref(props.item.amount);
+    const localUnit = ref(props.item.unit);
+
+    watch(() => props.item.amount, (newAmount) => {
+      localAmount.value = newAmount;
+    });
+
+    watch(() => props.item.unit, (newUnit) => {
+      localUnit.value = newUnit;
+    });
+
+    const updateAmount = () => {
+      if (localAmount.value > 0) {
+        emit('updateAmount', props.item, localAmount.value);
+      }
+    };
+
+    const updateUnit = () => {
+      emit('updateUnit', props.item, localUnit.value);
+    };
+
+    return {
+      localAmount,
+      localUnit,
+      updateAmount,
+      updateUnit
+    };
   }
-  </style>
+}
+</script>
+
+<style scoped>
+/* Bestaande styles blijven... */
+
+.item-amount-control {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.amount-input {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.unit-select {
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 8px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #fee2e2;
+  opacity: 1;
+}
+
+.shopping-item {
+  /* Update bestaande style */
+  justify-content: space-between;
+}
+</style>
