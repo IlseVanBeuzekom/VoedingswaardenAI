@@ -9,6 +9,7 @@ import RecipeEdit from '../views/RecipeEdit.vue';
 import WeekMenu from '../views/WeekMenu.vue';
 import ShoppingList from '../views/shoppingListView.vue';
 import DayOverview from '../views/DayOverview.vue';
+import DayAnalysis from '../views/DayAnalysis.vue';
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     path: '/day-overview',
     name: 'DayOverview',
     component: DayOverview
+  },
+  {
+    path: '/day-analysis',
+    name: 'DayAnalysis',
+    component: DayAnalysis
   }
 ];
 

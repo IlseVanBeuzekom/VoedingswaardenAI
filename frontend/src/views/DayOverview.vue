@@ -23,6 +23,15 @@
           >
             Vandaag
           </BaseButton>
+
+          <BaseButton 
+            @click="goToAnalysis"
+            variant="primary"
+            size="small"
+            :disabled="!selectedDate"
+          >
+            Analyse bekijken
+          </BaseButton>
         </div>
         
         <div v-if="selectedDate" class="selected-date-display">
@@ -116,6 +125,8 @@
   import DailyFoodEntryForm from '../components/forms/DailyFoodEntryForm.vue';
   import DailyFoodEntryItem from '../components/ui/DailyFoodEntryItem.vue';
   import BaseButton from '../components/ui/BaseButton.vue';
+  import { useRoute, useRouter } from 'vue-router';
+
   
   export default {
     name: 'DayOverview',
@@ -136,6 +147,9 @@
   
       const availableProducts = computed(() => productStore.products);
       const availableRecipes = computed(() => recipeStore.recipes);
+
+      const router = useRouter();
+      const route = useRoute();
   
       const totalNutrition = computed(() => {
         if (!dailyLog.value) return { energy_kcal: 0, proteins: 0, fats: 0, carbohydrates: 0, sugars: 0, fibers: 0 };
@@ -235,11 +249,22 @@
       const cancelEdit = () => {
         editingEntry.value = null;
       };
+
+      const goToAnalysis = () => {
+        router.push({ name: 'DayAnalysis', query: { date: selectedDate.value } });
+      };
   
       // Initialize with today's date
       onMounted(async () => {
         setToday();
         
+        // Check if date is passed via query params
+        if (route.query.date) {
+            selectedDate.value = route.query.date;
+          } else {
+            setToday();
+          }
+
         // Load products and recipes
         try {
           await Promise.all([
@@ -268,7 +293,8 @@
         handleUpdateEntry,
         handleDeleteEntry,
         startEdit,
-        cancelEdit
+        cancelEdit,
+        goToAnalysis
       };
     }
   }

@@ -72,6 +72,14 @@
           >
             Dag Overzicht
           </BaseButton>
+
+          <BaseButton
+            @click="$router.push('/day-analysis')"
+            variant="primary"
+            size="large"
+            >
+            Voedingsanalyse
+          </BaseButton>
         </div>
       </div>
     </div>
