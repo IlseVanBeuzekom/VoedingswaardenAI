@@ -74,10 +74,32 @@ class DailyFoodService:
             }
         
         if db_entry.recipe:
+            # Include full recipe data with ingredients for nutrition calculation
+            ingredients_data = []
+            for ingredient in db_entry.recipe.ingredients:
+                ingredients_data.append({
+                    'id': ingredient.id,
+                    'product_id': ingredient.product_id,
+                    'amount': ingredient.amount,
+                    'unit': ingredient.unit,
+                    'product': {
+                        'id': ingredient.product.id,
+                        'name': ingredient.product.name,
+                        'energy_kcal': ingredient.product.energy_kcal,
+                        'fats': ingredient.product.fats,
+                        'carbohydrates': ingredient.product.carbohydrates,
+                        'sugars': ingredient.product.sugars,
+                        'fibers': ingredient.product.fibers,
+                        'proteins': ingredient.product.proteins,
+                        'serving_size': ingredient.product.serving_size
+                    }
+                })
+            
             entry_data['recipe'] = {
                 'id': db_entry.recipe.id,
                 'name': db_entry.recipe.name,
-                'servings': db_entry.recipe.servings
+                'servings': db_entry.recipe.servings,
+                'ingredients': ingredients_data
             }
         
         return DailyFoodEntryResponse(**entry_data)

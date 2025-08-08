@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import date
 from models.daily_food_log import DailyFoodLogDB, DailyFoodEntryDB, DailyFoodLogCreate, DailyFoodEntryCreate
+from models.recipe import RecipeDB, RecipeIngredientDB
 
 class DailyFoodRepository:
     def __init__(self, db: Session):
@@ -25,7 +26,7 @@ class DailyFoodRepository:
         """Get daily log with all entries for a specific date"""
         return self.db.query(DailyFoodLogDB).options(
             joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.product),
-            joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.recipe)
+            joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.recipe).joinedload(RecipeDB.ingredients).joinedload(RecipeIngredientDB.product)#joinedload(RecipeIngredientDB.product)
         ).filter(DailyFoodLogDB.date == log_date).first()
     
     def add_entry(self, log_date: date, entry_data: DailyFoodEntryCreate) -> DailyFoodEntryDB:
