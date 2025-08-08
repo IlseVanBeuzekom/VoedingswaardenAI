@@ -61,6 +61,19 @@
           </BaseButton>
         </div>
       </div>
+
+      <div class="action-group">
+        <h2>Dagelijkse Voeding</h2>
+        <div class="group-buttons">
+          <BaseButton 
+            @click="$router.push('/day-overview')"
+            variant="primary"
+            size="large"
+          >
+            Dag Overzicht
+          </BaseButton>
+        </div>
+      </div>
     </div>
       
 

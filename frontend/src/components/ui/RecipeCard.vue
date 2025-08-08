@@ -51,7 +51,7 @@
         <p>{{ truncatedInstructions }}</p>
       </div>
 
-      <NutritionSummary :nutritionData="recipeNutrition" />
+      <!-- <NutritionSummary :nutritionData="recipeNutrition" /> -->
     </div>
   </template>
   
