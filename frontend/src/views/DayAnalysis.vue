@@ -78,7 +78,10 @@
         <div class="charts-section">
           <div class="chart-container">
             <h3>Macronutriënten verdeling</h3>
-            <MacronutrientChart :nutrition="totalNutrition" />
+            <PieChart 
+              :data="macronutrientData" 
+              unit="g"
+            />
           </div>
           
           <div class="chart-container">
@@ -87,8 +90,19 @@
           </div>
 
           <div class="chart-container">
-            <h3>Voeding per eetmoment</h3>
-            <MealNutritionChart :entries="dailyLog.entries" />
+            <h3>Energie per eetmoment</h3>
+            <PieChart 
+              :data="mealCaloriesData" 
+              unit="kcal"
+            />
+          </div>
+
+          <div class="chart-container">
+            <h3>Koolhydraten per eetmoment</h3>
+            <PieChart 
+              :data="mealCarbsData" 
+              unit="g"
+            />
           </div>
         </div>
   
@@ -109,9 +123,11 @@
   import { ref, computed, onMounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import dailyFoodService from '../services/dailyFoodService.js';
+  import { usePieChartData } from '../composables/usePieChartData.js';
   import BaseButton from '../components/ui/BaseButton.vue';
   import NutritionTile from '../components/ui/NutritionTile.vue';
   import MacronutrientChart from '../components/ui/MacronutrientChart.vue';
+  import PieChart from '../components/ui/PieChart.vue'
   import EnergyChart from '../components/ui/EnergyChart.vue';
   import DailyFoodTable from '../components/ui/DailyFoodTable.vue';
   import MealNutritionChart from '../components/ui/MealNutritionChart.vue';
@@ -121,6 +137,7 @@
     components: {
       BaseButton,
       NutritionTile,
+      PieChart,
       MacronutrientChart,
       EnergyChart,
       DailyFoodTable,
@@ -129,6 +146,7 @@
     setup() {
       const router = useRouter();
       const route = useRoute();
+      const {getMacronutrientData, getMealCaloriesData, getMealCarbsData } = usePieChartData();
   
       const selectedDate = ref('');
       const dailyLog = ref(null);
@@ -139,6 +157,21 @@
         if (!dailyLog.value) return { energy_kcal: 0, proteins: 0, fats: 0, carbohydrates: 0, sugars: 0, fibers: 0 };
         return dailyLog.value.calculateTotalNutrition();
       });
+
+      const macronutrientData = computed(() => {
+        return getMacronutrientData(totalNutrition.value);
+      });
+
+      const mealCaloriesData = computed(() => {
+        if (!dailyLog.value) return [];
+        return getMealCaloriesData(dailyLog.value.entries);
+      });
+
+      const mealCarbsData = computed(() => {
+        if (!dailyLog.value) return [];
+        return getMealCarbsData(dailyLog.value.entries);
+      });
+
   
       const setToday = () => {
         const today = new Date();
@@ -197,6 +230,9 @@
         loading,
         error,
         totalNutrition,
+        macronutrientData,
+        mealCaloriesData,
+        mealCarbsData,
         setToday,
         formatValue,
         formatDisplayDate,
@@ -281,8 +317,7 @@
   
   .charts-section {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 32px;
   }
   
@@ -298,10 +333,6 @@
     color: #1f2937;
     text-align: center;
   }
-
-  .chart-container:last-child {
-  grid-column: 1 / -1;  /* Span beide kolommen voor meal chart */
-}
   
   .table-section {
     background: white;
