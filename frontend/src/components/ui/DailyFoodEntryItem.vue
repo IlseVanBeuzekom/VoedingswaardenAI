@@ -3,7 +3,11 @@
       <td class="name-cell">
         <div class="item-info">
           <span class="item-name">{{ entry.getName() }}</span>
-          <span class="item-type">{{ entry.getType() === 'product' ? 'Product' : 'Recept' }}</span>
+          <div class="item-meta">
+            <span class="item-type">{{ entry.getType() === 'product' ? 'Product' : 'Recept' }}</span>
+            <span class="meal-type">{{ getMealTypeDisplay(entry.meal_type) }}</span>
+          </div>
+          
         </div>
       </td>
       <td class="amount-cell">
@@ -70,16 +74,47 @@
       const formatValue = (value) => {
         return Math.round(value * 10) / 10;
       };
+
+      const getMealTypeDisplay = (mealType) => {
+        const displays = {
+          ontbijt: '🍳 Ontbijt',
+          lunch: '🥪 Lunch', 
+          diner: '🍽️ Diner',
+          tussendoortje: '🍎 Snack'
+        };
+        return displays[mealType] || '🍎 Snack';
+      }
   
       return {
         nutrition,
-        formatValue
+        formatValue,
+        getMealTypeDisplay
       };
     }
   }
   </script>
   
   <style scoped>
+  .item-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .item-type,
+  .meal-type {
+    font-size: 12px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .meal-type {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
   .entry-row {
     border-bottom: 1px solid #e5e7eb;
   }

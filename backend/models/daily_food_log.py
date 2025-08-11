@@ -1,5 +1,5 @@
 # backend/models/daily_food_log.py
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -7,6 +7,14 @@ from datetime import date
 from models.product import Base
 from models.product import ProductDB
 from models.recipe import RecipeDB
+
+import enum
+
+class MealType(enum.Enum):
+    ONTBIJT = "ontbijt"
+    LUNCH = "lunch" 
+    DINER = "diner"
+    TUSSENDOORTJE = "tussendoortje"
 
 class DailyFoodLogDB(Base):
     __tablename__ = "daily_food_logs"
@@ -29,8 +37,9 @@ class DailyFoodEntryDB(Base):
     
     amount = Column(Float, nullable=False)
     unit = Column(String, nullable=False, default="gram")
+    meal_type = Column(String(20), nullable=False, default="tussendoortje") #Column(Enum(MealType), nullable=False, default=MealType.TUSSENDOORTJE)  # NEW
     
-    # Relationships
+    # Relationships blijven hetzelfde
     daily_log = relationship("DailyFoodLogDB", back_populates="entries")
     product = relationship("ProductDB")
     recipe = relationship("RecipeDB")
@@ -41,6 +50,7 @@ class DailyFoodEntryBase(BaseModel):
     recipe_id: Optional[int] = None
     amount: float = Field(..., gt=0)
     unit: str = Field(..., min_length=1, max_length=50)
+    meal_type: str = "tussendoortje" #Field(..., description="ontbijt, lunch, diner, tussendoortje")
 
 class DailyFoodEntryCreate(DailyFoodEntryBase):
     pass

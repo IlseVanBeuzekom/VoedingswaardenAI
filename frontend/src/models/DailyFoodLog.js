@@ -49,6 +49,7 @@ export class DailyFoodEntry {
     this.recipe_id = data.recipe_id || null;
     this.amount = data.amount || 0;
     this.unit = data.unit || 'gram';
+    this.meal_type = data.meal_type || 'tussendoortje';
     this.product = data.product || null;
     this.recipe = data.recipe || null;
   }
@@ -62,7 +63,8 @@ export class DailyFoodEntry {
       product_id: this.product_id,
       recipe_id: this.recipe_id,
       amount: this.amount,
-      unit: this.unit
+      unit: this.unit,
+      meal_type: this.meal_type
     };
   }
 

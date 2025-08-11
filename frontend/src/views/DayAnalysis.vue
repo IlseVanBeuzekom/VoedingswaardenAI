@@ -85,6 +85,11 @@
             <h3>Energie per maaltijd</h3>
             <EnergyChart :entries="dailyLog.entries" />
           </div>
+
+          <div class="chart-container">
+            <h3>Voeding per eetmoment</h3>
+            <MealNutritionChart :entries="dailyLog.entries" />
+          </div>
         </div>
   
       <DailyFoodTable
@@ -108,7 +113,8 @@
   import NutritionTile from '../components/ui/NutritionTile.vue';
   import MacronutrientChart from '../components/ui/MacronutrientChart.vue';
   import EnergyChart from '../components/ui/EnergyChart.vue';
-  import DailyFoodTable from '../components/ui/DailyFoodTable.vue'
+  import DailyFoodTable from '../components/ui/DailyFoodTable.vue';
+  import MealNutritionChart from '../components/ui/MealNutritionChart.vue';
   
   export default {
     name: 'DayAnalysis',
@@ -117,7 +123,8 @@
       NutritionTile,
       MacronutrientChart,
       EnergyChart,
-      DailyFoodTable
+      DailyFoodTable,
+      MealNutritionChart
     },
     setup() {
       const router = useRouter();
@@ -275,6 +282,7 @@
   .charts-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 32px;
   }
   
@@ -290,6 +298,10 @@
     color: #1f2937;
     text-align: center;
   }
+
+  .chart-container:last-child {
+  grid-column: 1 / -1;  /* Span beide kolommen voor meal chart */
+}
   
   .table-section {
     background: white;
@@ -409,6 +421,15 @@
     
     .entries-table th:nth-child(n+4) {
       display: none;
+    }
+
+    .charts-section {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    
+    .charts-section > .chart-container:last-child {
+      grid-column: 1;
     }
   }
   </style>

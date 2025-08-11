@@ -5,6 +5,8 @@
     
     <form @submit.prevent="handleSubmit" class="form">
       <div class="form-row">
+        <MealTypeSelector v-model="form.meal_type" />
+
         <div class="form-group">
           <label for="type">Type</label>
           <select v-model="form.type" id="type" class="form-input" @change="resetSelection">
@@ -87,10 +89,11 @@
 <script>
 import { reactive, computed } from 'vue';
 import BaseButton from '../ui/BaseButton.vue';
+import MealTypeSelector from '../ui/MealTypeSelector.vue';
 
 export default {
   name: 'DailyFoodEntryForm',
-  components: { BaseButton },
+  components: { BaseButton, MealTypeSelector },
   emits: ['submit', 'cancel'],
   props: {
     products: {
@@ -113,6 +116,7 @@ export default {
   },
   setup(props, { emit }) {
     const form = reactive({
+      meal_type: 'tussendoortje',
       type: 'product',
       selectedId: null,
       amount: null,
@@ -121,6 +125,7 @@ export default {
 
     // Initialize form with existing data for edit mode
     if (props.initialData) {
+      form.meal_type = props.initialData.meal_type || 'tussendoortje';
       form.type = props.initialData.product ? 'product' : 'recipe';
       form.selectedId = props.initialData.product_id || props.initialData.recipe_id;
       form.amount = props.initialData.amount;
@@ -140,7 +145,8 @@ export default {
     const isFormValid = computed(() => {
       return form.selectedId && 
              form.amount > 0 && 
-             form.unit.trim().length > 0;
+             form.unit.trim().length > 0 &&
+             form.meal_type.trim().length > 0;
     });
 
     const resetSelection = () => {
@@ -158,6 +164,7 @@ export default {
     const handleSubmit = () => {
       if (isFormValid.value) {
         const submitData = {
+          meal_type: form.meal_type,
           amount: form.amount,
           unit: form.unit
         };

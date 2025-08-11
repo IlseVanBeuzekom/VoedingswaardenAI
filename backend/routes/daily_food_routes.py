@@ -36,6 +36,11 @@ async def add_entry(
         if entry.product_id and entry.recipe_id:
             raise HTTPException(status_code=400, detail="Cannot provide both product_id and recipe_id")
         
+        valid_meal_types = ["ontbijt", "lunch", "diner", "tussendoortje"]
+        if entry.meal_type not in valid_meal_types:
+            raise HTTPException(status_code=400, detail=f"Invalid meal_type. Must be one of: {valid_meal_types}")
+        
+
         return daily_food_service.add_entry(log_date, entry)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

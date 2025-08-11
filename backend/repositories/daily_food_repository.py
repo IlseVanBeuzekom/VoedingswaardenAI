@@ -26,22 +26,29 @@ class DailyFoodRepository:
         """Get daily log with all entries for a specific date"""
         return self.db.query(DailyFoodLogDB).options(
             joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.product),
-            joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.recipe).joinedload(RecipeDB.ingredients).joinedload(RecipeIngredientDB.product)#joinedload(RecipeIngredientDB.product)
+            joinedload(DailyFoodLogDB.entries).joinedload(DailyFoodEntryDB.recipe).joinedload(RecipeDB.ingredients).joinedload(RecipeIngredientDB.product)
         ).filter(DailyFoodLogDB.date == log_date).first()
     
     def add_entry(self, log_date: date, entry_data: DailyFoodEntryCreate) -> DailyFoodEntryDB:
         """Add a new entry to the daily log"""
-        daily_log = self.get_or_create_daily_log(log_date)
-        
-        db_entry = DailyFoodEntryDB(
-            daily_log_id=daily_log.id,
-            **entry_data.dict()
-        )
-        self.db.add(db_entry)
-        self.db.commit()
-        self.db.refresh(db_entry)
-        
-        return db_entry
+        try: 
+            daily_log = self.get_or_create_daily_log(log_date)
+            
+            db_entry = DailyFoodEntryDB(
+                daily_log_id=daily_log.id,
+                **entry_data.dict()
+            )
+            
+            self.db.add(db_entry)
+            self.db.flush()  # Om direct de ID te krijgen zonder commit
+            
+            self.db.commit()
+            self.db.refresh(db_entry)
+            
+            return db_entry
+        except Exception as e:
+            self.db.rollback()
+            raise e
     
     def update_entry(self, entry_id: int, entry_data: DailyFoodEntryCreate) -> Optional[DailyFoodEntryDB]:
         """Update an existing entry"""
