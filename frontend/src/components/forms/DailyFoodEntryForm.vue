@@ -178,6 +178,15 @@ export default {
         }
 
         emit('submit', submitData);
+
+         // Reset form after successful submit (alleen voor create mode)
+         if (props.mode === 'create') {
+          form.selectedId = null;
+          form.amount = null;
+          if (form.type === 'product' ) {
+            form.unit = 'gram'
+          }
+         }
       }
     };
 

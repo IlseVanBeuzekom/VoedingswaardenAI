@@ -57,9 +57,12 @@ class DailyFoodRepository:
         ).first()
         
         if db_entry:
-            update_data = entry_data.dict()
-            for key, value in update_data.items():
-                setattr(db_entry, key, value)
+            db_entry.product_id = entry_data.product_id
+            db_entry.recipe_id = entry_data.recipe_id
+            db_entry.amount = entry_data.amount
+            db_entry.unit = entry_data.unit
+            db_entry.meal_type = entry_data.meal_type
+            
             self.db.commit()
             self.db.refresh(db_entry)
         

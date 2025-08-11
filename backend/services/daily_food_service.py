@@ -11,7 +11,6 @@ class DailyFoodService:
     def get_daily_log(self, log_date: date) -> Optional[DailyFoodLogResponse]:
         """Get daily food log for a specific date"""
         db_log = self.daily_food_repo.get_daily_log_by_date(log_date)
-        
         if not db_log:
             # Return empty log structure for the date
             return DailyFoodLogResponse(
@@ -41,7 +40,6 @@ class DailyFoodService:
         formatted_entries = []
         for entry in db_log.entries:
             formatted_entries.append(self._format_entry_response(entry))
-        
         return DailyFoodLogResponse(
             id=db_log.id,
             date=db_log.date,
@@ -56,6 +54,7 @@ class DailyFoodService:
             'recipe_id': db_entry.recipe_id,
             'amount': db_entry.amount,
             'unit': db_entry.unit,
+            'meal_type': db_entry.meal_type,
             'product': None,
             'recipe': None
         }
