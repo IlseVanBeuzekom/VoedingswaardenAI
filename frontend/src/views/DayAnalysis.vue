@@ -87,57 +87,13 @@
           </div>
         </div>
   
-        <!-- Detailed Table -->
-        <div class="table-section">
-          <h3>Gedetailleerd overzicht</h3>
-          <div class="table-container">
-            <table class="entries-table">
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Hoeveelheid</th>
-                  <th>Energie</th>
-                  <th>Eiwitten</th>
-                  <th>Vetten</th>
-                  <th>Koolhydraten</th>
-                  <th>Suikers</th>
-                  <th>Vezels</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="entry in dailyLog.entries" :key="entry.id" class="entry-row">
-                  <td class="name-cell">
-                    <div class="item-info">
-                      <span class="item-name">{{ entry.getName() }}</span>
-                      <span class="item-type">{{ entry.getType() === 'product' ? 'Product' : 'Recept' }}</span>
-                    </div>
-                  </td>
-                  <td class="amount-cell">{{ formatValue(entry.amount) }} {{ entry.unit }}</td>
-                  <td class="nutrition-cell">{{ Math.round(entry.calculateNutrition().energy_kcal) }} kcal</td>
-                  <td class="nutrition-cell">{{ formatValue(entry.calculateNutrition().proteins) }}g</td>
-                  <td class="nutrition-cell">{{ formatValue(entry.calculateNutrition().fats) }}g</td>
-                  <td class="nutrition-cell">{{ formatValue(entry.calculateNutrition().carbohydrates) }}g</td>
-                  <td class="nutrition-cell">{{ formatValue(entry.calculateNutrition().sugars) }}g</td>
-                  <td class="nutrition-cell">{{ formatValue(entry.calculateNutrition().fibers) }}g</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="totals-row">
-                  <td class="totals-label"><strong>Totaal</strong></td>
-                  <td>-</td>
-                  <td class="totals-value"><strong>{{ Math.round(totalNutrition.energy_kcal) }} kcal</strong></td>
-                  <td class="totals-value"><strong>{{ formatValue(totalNutrition.proteins) }}g</strong></td>
-                  <td class="totals-value"><strong>{{ formatValue(totalNutrition.fats) }}g</strong></td>
-                  <td class="totals-value"><strong>{{ formatValue(totalNutrition.carbohydrates) }}g</strong></td>
-                  <td class="totals-value"><strong>{{ formatValue(totalNutrition.sugars) }}g</strong></td>
-                  <td class="totals-value"><strong>{{ formatValue(totalNutrition.fibers) }}g</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
+      <DailyFoodTable
+        :entries="dailyLog.entries"
+        :loading="false"
+        title="Gedetailleerd overzicht"
+        :show-actions="false"
+        />
       </div>
-  
       <div v-if="error" class="error-message">
         {{ error }}
       </div>
@@ -152,6 +108,7 @@
   import NutritionTile from '../components/ui/NutritionTile.vue';
   import MacronutrientChart from '../components/ui/MacronutrientChart.vue';
   import EnergyChart from '../components/ui/EnergyChart.vue';
+  import DailyFoodTable from '../components/ui/DailyFoodTable.vue'
   
   export default {
     name: 'DayAnalysis',
@@ -159,7 +116,8 @@
       BaseButton,
       NutritionTile,
       MacronutrientChart,
-      EnergyChart
+      EnergyChart,
+      DailyFoodTable
     },
     setup() {
       const router = useRouter();
@@ -233,8 +191,8 @@
         error,
         totalNutrition,
         setToday,
-        formatDisplayDate,
         formatValue,
+        formatDisplayDate,
         loadDailyLog,
         goToDayOverview
       };

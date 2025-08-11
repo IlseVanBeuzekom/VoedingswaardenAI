@@ -58,58 +58,15 @@
         @cancel="cancelEdit"
       />
   
-      <!-- Daily Log Table -->
-      <div v-if="dailyLog" class="daily-log-section">
-        <h2>Gegeten op {{ formatDisplayDate(selectedDate) }}</h2>
-        
-        <div v-if="loading" class="loading">
-          Gegevens laden...
-        </div>
-  
-        <div v-else-if="dailyLog.entries.length === 0" class="empty-state">
-          <p>Nog geen items toegevoegd voor deze dag.</p>
-        </div>
-  
-        <div v-else class="table-container">
-          <table class="entries-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Hoeveelheid</th>
-                <th>Energie</th>
-                <th>Eiwitten</th>
-                <th>Vetten</th>
-                <th>Koolhydraten</th>
-                <th>Suikers</th>
-                <th>Vezels</th>
-                <th>Acties</th>
-              </tr>
-            </thead>
-            <tbody>
-              <DailyFoodEntryItem
-                v-for="entry in dailyLog.entries"
-                :key="entry.id"
-                :entry="entry"
-                @edit="startEdit"
-                @delete="handleDeleteEntry"
-              />
-            </tbody>
-            <tfoot v-if="dailyLog.entries.length > 0">
-              <tr class="totals-row">
-                <td class="totals-label"><strong>Totaal</strong></td>
-                <td>-</td>
-                <td class="totals-value"><strong>{{ Math.round(totalNutrition.energy_kcal) }} kcal</strong></td>
-                <td class="totals-value"><strong>{{ formatValue(totalNutrition.proteins) }}g</strong></td>
-                <td class="totals-value"><strong>{{ formatValue(totalNutrition.fats) }}g</strong></td>
-                <td class="totals-value"><strong>{{ formatValue(totalNutrition.carbohydrates) }}g</strong></td>
-                <td class="totals-value"><strong>{{ formatValue(totalNutrition.sugars) }}g</strong></td>
-                <td class="totals-value"><strong>{{ formatValue(totalNutrition.fibers) }}g</strong></td>
-                <td>-</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
+      <DailyFoodTable
+        v-if="dailyLog"
+        :entries="dailyLog.entries"
+        :loading="loading"
+        :title="`Gegeten op ${formatDisplayDate(selectedDate)}`"
+        :show-actions="true"
+        @edit="startEdit"
+        @delete="handleDeleteEntry"
+      />
   
       <div v-if="error" class="error-message">
         {{ error }}
@@ -123,16 +80,15 @@
   import { useRecipeStore } from '../stores/recipeStore.js';
   import dailyFoodService from '../services/dailyFoodService.js';
   import DailyFoodEntryForm from '../components/forms/DailyFoodEntryForm.vue';
-  import DailyFoodEntryItem from '../components/ui/DailyFoodEntryItem.vue';
   import BaseButton from '../components/ui/BaseButton.vue';
   import { useRoute, useRouter } from 'vue-router';
-
+  import DailyFoodTable from '../components/ui/DailyFoodTable.vue';
   
   export default {
     name: 'DayOverview',
     components: {
       DailyFoodEntryForm,
-      DailyFoodEntryItem,
+      DailyFoodTable,
       BaseButton
     },
     setup() {
@@ -284,10 +240,8 @@
         error,
         availableProducts,
         availableRecipes,
-        totalNutrition,
         setToday,
         formatDisplayDate,
-        formatValue,
         loadDailyLog,
         handleAddEntry,
         handleUpdateEntry,

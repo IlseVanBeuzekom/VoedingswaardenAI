@@ -27,7 +27,7 @@
       <td class="nutrition-cell">
         {{ formatValue(nutrition.fibers) }}g
       </td>
-      <td class="actions-cell">
+      <td v-if="showActions" class="actions-cell">
         <button 
           @click="$emit('edit', entry)"
           class="action-btn edit-btn"
@@ -56,6 +56,10 @@
       entry: {
         type: Object,
         required: true
+      },
+      showActions: {
+        type: Boolean,
+        default: true
       }
     },
     setup(props) {
