@@ -61,8 +61,10 @@
           v-for="recipe in filteredRecipes" 
           :key="recipe.id"
           :recipe="recipe"
+          :selectMode="selectMode"
           @edit="editRecipe"
           @delete="deleteRecipe"
+          @select="selectRecipe"
         />
       </div>
     </div>
@@ -70,7 +72,7 @@
   
   <script>
   import { onMounted, ref, computed } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import { useRecipeStore } from '../stores/recipeStore.js';
   import BaseButton from '../components/ui/BaseButton.vue';
   import RecipeCard from '../components/ui/RecipeCard.vue';
@@ -85,7 +87,14 @@
       const recipeStore = useRecipeStore();
       const router = useRouter();
       const searchQuery = ref('');
-  
+      const route = useRoute();
+      const selectMode = computed(() => route.query.mode === 'select');
+
+      const selectRecipe = (recipe) => {
+        sessionStorage.setItem('selectedRecipe', JSON.stringify(recipe));
+        router.back(); // or router.push('/week-menu')
+      };
+
       const filteredRecipes = computed(() => {
         if (!searchQuery.value.trim()) {
           return recipeStore.recipes;
@@ -133,7 +142,9 @@
         filteredRecipes,
         clearSearch,
         editRecipe,
-        deleteRecipe
+        deleteRecipe,
+        selectMode, 
+        selectRecipe
       };
     }
   }

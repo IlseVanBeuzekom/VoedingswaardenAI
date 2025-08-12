@@ -26,7 +26,9 @@
             :addToShoppingList="getAddToShoppingList(dayDate)"
             :availableRecipes="availableRecipes"
             @recipeChange="onRecipeChange"
+            @chooseRecipe="onChooseRecipe"
           />
+
         </div>
         
         <div class="form-actions">
@@ -81,6 +83,18 @@
       const dayCount = ref(0);
       const currentWeekMenu = ref(new WeekMenu());
   
+      const onChooseRecipe = (data) => {
+        // Store current state in sessionStorage
+        sessionStorage.setItem('weekMenuState', JSON.stringify({
+          startDate: selectedStartDate.value,
+          endDate: selectedEndDate.value,
+          targetDate: data.date,
+          weekMenu: currentWeekMenu.value
+        }));
+        
+        router.push('/recipes?mode=select');
+      };
+
       const showDaySelectors = computed(() => {
         return selectedStartDate.value && selectedEndDate.value && dayCount.value > 0;
       });
@@ -198,6 +212,33 @@
       onMounted(async () => {
         try {
           await recipeStore.fetchRecipes();
+
+          // Check if returning from recipe selection
+          const savedState = sessionStorage.getItem('weekMenuState');
+          const selectedRecipe = sessionStorage.getItem('selectedRecipe');
+          
+          if (savedState && selectedRecipe) {
+            const state = JSON.parse(savedState);
+            const recipe = JSON.parse(selectedRecipe);
+            
+            // Restore state
+            selectedStartDate.value = state.startDate;
+            selectedEndDate.value = state.endDate;
+            dayCount.value = Math.ceil((new Date(state.endDate) - new Date(state.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+            currentWeekMenu.value = new WeekMenu(state.weekMenu);
+            
+            // Apply selected recipe
+            onRecipeChange({
+              date: state.targetDate,
+              recipeId: recipe.id,
+              servings: recipe.servings,
+              addToShoppingList: true
+            });
+            
+            // Clean up
+            sessionStorage.removeItem('weekMenuState');
+            sessionStorage.removeItem('selectedRecipe');
+          }
         } catch (error) {
           console.error('Error loading recipes:', error);
         }
@@ -218,7 +259,8 @@
         onRecipeChange,
         saveWeekMenu,
         goToShoppingList,
-        showShoppingListButton
+        showShoppingListButton,
+        onChooseRecipe
       };
     }
   }

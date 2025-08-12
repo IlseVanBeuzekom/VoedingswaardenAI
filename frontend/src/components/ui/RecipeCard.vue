@@ -1,6 +1,6 @@
 <template>
     <div class="recipe-card">
-      <div class="card-actions">
+      <!-- <div class="card-actions">
         <button 
           @click="$emit('edit', recipe.id)"
           class="action-btn edit-btn"
@@ -15,8 +15,35 @@
         >
           ❌
         </button>
+      </div> -->
+      <div class="card-actions">
+        <template v-if="selectMode">
+          <BaseButton 
+            @click="$emit('select', recipe)"
+            variant="primary"
+            size="small"
+          >
+            Kies recept
+          </BaseButton>
+        </template>
+        <template v-else>
+          <button 
+            @click="$emit('edit', recipe.id)"
+            class="action-btn edit-btn"
+            title="Recept bewerken"
+          >
+            ✏️
+          </button>
+          <button 
+            @click="$emit('delete', recipe.id)"
+            class="action-btn delete-btn"
+            title="Recept verwijderen"
+          >
+            ❌
+          </button>
+        </template>
       </div>
-  
+
       <h3>{{ recipe.name }}</h3>
       
       <div class="recipe-meta">
@@ -62,11 +89,15 @@
   
   export default {
     name: 'RecipeCard',
-    emits: ['edit', 'delete'],
+    emits: ['edit', 'delete', 'select'],
     props: {
       recipe: {
         type: Object,
         required: true
+      },
+      selectMode: {
+        type: Boolean,
+        default: false
       }
     },
     components: {

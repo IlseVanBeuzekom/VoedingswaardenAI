@@ -21,7 +21,26 @@
           {{ recipe.name }} ({{ recipe.servings }} pers, {{ recipe.preparation_time }} min)
         </option>
       </select>
-      
+      <BaseButton 
+        v-if="!selectedRecipe"
+        @click="chooseRecipe"
+        variant="secondary"
+        size="small"
+      >
+        Kies recept
+      </BaseButton>
+
+      <div v-if="selectedRecipe" class="selected-recipe-display">
+        <!-- <span class="recipe-name">{{ selectedRecipe.name }}</span> -->
+        <BaseButton 
+          @click="chooseRecipe"
+          variant="secondary"
+          size="small"
+        >
+          Wijzig recept
+        </BaseButton>
+      </div>
+
       <div v-if="selectedRecipe" class="recipe-options">
         <div class="servings-control">
           <label for="servings">Personen:</label>
@@ -91,6 +110,13 @@
       const customServings = ref(props.customServings);
       const addToShoppingList = ref(props.addToShoppingList);
 
+      const chooseRecipe = () => {
+        emit('chooseRecipe', {
+          date: props.date,
+          returnRoute: '/week-menu'
+        });
+      };
+
       const selectedRecipe = computed(() => {
         if (!selectedRecipeId.value) return null;
         return props.availableRecipes.find(r => r.id == selectedRecipeId.value);
@@ -153,7 +179,8 @@
         formatDayName,
         formatDate,
         onRecipeChange,
-        onOptionsChange
+        onOptionsChange, 
+        chooseRecipe
       };
     }
   }
@@ -166,7 +193,7 @@
     border-radius: 8px;
     padding: 20px;
     transition: box-shadow 0.2s ease;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 140px 1fr auto;
