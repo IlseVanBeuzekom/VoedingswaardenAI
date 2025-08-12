@@ -10,6 +10,34 @@
         </BaseButton>
       </div>
   
+      <!-- Search Bar -->
+      <div class="search-section">
+        <div class="search-bar">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Zoek op ingrediënt (bijv. tomaat, kip, pasta...)"
+            class="search-input"
+          />
+          <button 
+            v-if="searchQuery"
+            @click="clearSearch"
+            class="clear-btn"
+            title="Wissen"
+          >
+            ❌
+          </button>
+        </div>
+        
+        <!-- <div v-if="searchQuery && filteredRecipes.length > 0" class="search-results-info">
+          Recepten met ingrediënt "{{ searchQuery }}" ({{ filteredRecipes.length }})
+        </div> -->
+        
+        <div v-if="searchQuery && filteredRecipes.length === 0 && !recipeStore.loading" class="no-results">
+          Geen recepten gevonden met ingrediënt "{{ searchQuery }}"
+        </div>
+      </div>
+
       <div v-if="recipeStore.loading" class="loading">
         Recepten laden...
       </div>
@@ -30,7 +58,7 @@
   
       <div v-else class="recipes-grid">
         <RecipeCard
-          v-for="recipe in recipeStore.recipes" 
+          v-for="recipe in filteredRecipes" 
           :key="recipe.id"
           :recipe="recipe"
           @edit="editRecipe"
@@ -41,7 +69,7 @@
   </template>
   
   <script>
-  import { onMounted } from 'vue';
+  import { onMounted, ref, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { useRecipeStore } from '../stores/recipeStore.js';
   import BaseButton from '../components/ui/BaseButton.vue';
@@ -56,7 +84,30 @@
     setup() {
       const recipeStore = useRecipeStore();
       const router = useRouter();
+      const searchQuery = ref('');
   
+      const filteredRecipes = computed(() => {
+        if (!searchQuery.value.trim()) {
+          return recipeStore.recipes;
+        }
+        
+        const query = searchQuery.value.toLowerCase().trim();
+        
+        return recipeStore.recipes.filter(recipe => {
+          // Zoek in ingrediënten
+          return recipe.ingredients.some(ingredient => {
+            if (ingredient.product?.name) {
+              return ingredient.product.name.toLowerCase().includes(query);
+            }
+            return false;
+          });
+        });
+      });
+  
+      const clearSearch = () => {
+        searchQuery.value = '';
+      };
+
       onMounted(async () => {
         await recipeStore.fetchRecipes();
       });
@@ -78,6 +129,9 @@
   
       return {
         recipeStore,
+        searchQuery,
+        filteredRecipes,
+        clearSearch,
         editRecipe,
         deleteRecipe
       };
@@ -86,6 +140,62 @@
   </script>
   
   <style scoped>
+  .search-section {
+    margin-bottom: 32px;
+  }
+
+  .search-bar {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 50px 12px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .clear-btn:hover {
+    opacity: 1;
+    background-color: #f3f4f6;
+  }
+
+  .search-results-info {
+    text-align: center;
+    margin-top: 12px;
+    color: #059669;
+    background-color: #ecfdf5;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
   .recipe-overview {
     max-width: 1200px;
     margin: 0 auto;
@@ -133,6 +243,10 @@
       text-align: center;
     }
     
+    .search-bar {
+      max-width: 100%;
+    }
+
     .recipes-grid {
       grid-template-columns: 1fr;
     }
