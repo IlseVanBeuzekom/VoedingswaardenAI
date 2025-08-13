@@ -16,6 +16,14 @@
           ❌
         </button>
       </div> -->
+      
+       <div class="recipe-image-container" v-if="recipe.image_url">
+        <img 
+          :src="`http://localhost:8000${recipe.image_url}`" 
+          :alt="recipe.name"
+          class="recipe-card-image"
+        />
+      </div>
       <div class="card-actions">
         <template v-if="selectMode">
           <BaseButton 
@@ -77,7 +85,6 @@
         <h4>Bereiding</h4>
         <p>{{ truncatedInstructions }}</p>
       </div>
-
       <!-- <NutritionSummary :nutritionData="recipeNutrition" /> -->
     </div>
   </template>
@@ -127,6 +134,20 @@
   </script>
   
   <style scoped>
+  .recipe-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 16px;
+}
+
+.recipe-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
   .recipe-card {
     background: white;
     border: 1px solid #e5e7eb;
@@ -137,6 +158,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow: hidden;
   }
   
   .recipe-card:hover {
@@ -156,7 +178,7 @@
     white-space: nowrap;
   }
   .action-btn {
-    background: rgba(196, 33, 33, 0.9);
+    background: rgba(255, 255, 255, 0.9);
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     width: 32px;

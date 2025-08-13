@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
+import uuid
+from pathlib import Path
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -65,3 +68,45 @@ async def delete_recipe(
         return {"message": "Recipe successfully deleted"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+# Voeg toe na de bestaande imports
+UPLOAD_DIR = Path("uploads/recipes")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+@router.post("/{recipe_id}/image")
+async def upload_recipe_image(
+    recipe_id: int,
+    file: UploadFile = File(...),
+    recipe_service: RecipeService = Depends(get_recipe_service)
+):
+    # Check if recipe exists
+    recipe = recipe_service.get_recipe_by_id(recipe_id)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    # Validate file type
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Generate unique filename
+    file_extension = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        content = await file.read()
+        buffer.write(content)
+    
+    # Update recipe with image URL
+    image_url = f"/api/recipes/{recipe_id}/image/{unique_filename}"
+    updated_recipe = recipe_service.update_recipe_image(recipe_id, image_url)
+    
+    return {"image_url": image_url}
+
+@router.get("/{recipe_id}/image/{filename}")
+async def get_recipe_image(recipe_id: int, filename: str):
+    file_path = UPLOAD_DIR / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(file_path)

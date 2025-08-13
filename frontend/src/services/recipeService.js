@@ -6,7 +6,14 @@ const API_BASE_URL = 'http://localhost:8000/api';
 class RecipeService {
   async createRecipe(recipeData) {
     const response = await axios.post(`${API_BASE_URL}/recipes/`, recipeData);
-    return Recipe.fromAPI(response.data);
+    const recipe = Recipe.fromAPI(response.data);
+
+    // Upload image if present
+    if(recipeData.image){
+      await this.uploadRecipeImage(recipe.id, recipeData.image)
+    }
+
+    return recipe;
   }
 
   async getAllRecipes() {
@@ -21,7 +28,29 @@ class RecipeService {
 
   async updateRecipe(recipeId, recipeData) {
     const response = await axios.put(`${API_BASE_URL}/recipes/${recipeId}`, recipeData);
-    return Recipe.fromAPI(response.data);
+    const recipe = Recipe.fromAPI(response.data);
+
+    // Upload image if present
+    if(recipeData.image) {
+      await this.uploadRecipeImage(recipeId, recipeData.image)
+    }
+    return recipe;
+  }
+
+  async uploadRecipeImage(recipeId, imageFile) {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    const response = await axios.post(
+      `${API_BASE_URL}/recipes/${recipeId}/image`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      }
+    );
+    return response.data;
   }
 
   async deleteRecipe(recipeId) {

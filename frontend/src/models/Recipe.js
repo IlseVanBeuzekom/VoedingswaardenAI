@@ -5,6 +5,7 @@ export class Recipe {
       this.servings = data.servings || 4;
       this.preparation_time = data.preparation_time || 30;
       this.instructions = data.instructions || '';
+      this.image_url = data.image_url || null;
       this.ingredients = data.ingredients ? data.ingredients.map(ing => new RecipeIngredient(ing)) : [];
     }
   
@@ -18,6 +19,7 @@ export class Recipe {
         servings: this.servings,
         preparation_time: this.preparation_time,
         instructions: this.instructions,
+        image_url: this.image_url,
         ingredients: this.ingredients.map(ing => ing.toAPI())
       };
     }

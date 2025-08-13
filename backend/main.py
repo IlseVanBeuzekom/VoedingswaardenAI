@@ -10,6 +10,7 @@ from models.recipe import Base as RecipeBase
 from models.weekmenu import Base as WeekMenuBase
 from models.daily_food_log import Base as DailyFoodBase
 from config.database import engine
+from fastapi.staticfiles import StaticFiles
 
 # Create tables
 ProductBase.metadata.create_all(bind=engine)
@@ -27,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Include routers
 app.include_router(product_router)

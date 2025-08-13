@@ -1,7 +1,41 @@
 <template>
     <div class="recipe-form-container">
       <h1>{{ mode === 'edit' ? 'Recept Bewerken' : 'Nieuw Recept' }}</h1>
-      
+      <div class="image-section">
+        <div class="image-preview" v-if="form.image_url || imagePreview">
+          <img 
+            :src="imagePreview || `http://localhost:8000${form.image_url}`" 
+            alt="Recipe image"
+            class="recipe-image"
+          />
+          <button 
+            @click="removeImage" 
+            type="button" 
+            class="remove-image-btn"
+            title="Afbeelding verwijderen"
+          >
+            ❌
+          </button>
+        </div>
+        
+        <div class="image-upload" v-else>
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/*"
+            @change="handleImageSelect"
+            style="display: none"
+          />
+          <button 
+            @click="$refs.fileInput.click()"
+            type="button"
+            class="upload-btn"
+          >
+            📷 Afbeelding toevoegen
+          </button>
+        </div>
+      </div>
+
       <form @submit.prevent="handleSubmit" class="recipe-form">
         <!-- Basic Recipe Info -->
         <div class="recipe-header">
@@ -158,7 +192,7 @@
   </template>
   
   <script>
-  import { reactive, computed, watch, onMounted } from 'vue';
+  import { reactive, ref, computed, watch, onMounted } from 'vue';
   import { useProductStore } from '../../stores/productStore.js';
   import { Recipe } from '../../models/Recipe.js';
   import BaseButton from '../ui/BaseButton.vue';
@@ -206,6 +240,27 @@
         }
       }, { immediate: true });
   
+      const imagePreview = ref(null);
+      const selectedImage = ref(null);
+
+      const handleImageSelect = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          selectedImage.value = file;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imagePreview.value = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const removeImage = () => {
+        imagePreview.value = null;
+        selectedImage.value = null;
+        form.image_url = null;
+      };
+
       const isFormValid = computed(() => {
         return form.name.trim().length > 0 &&
                form.servings > 0 &&
@@ -227,7 +282,12 @@
   
       const handleSubmit = () => {
         if (isFormValid.value) {
-          emit('submit', form.toAPI());
+          const submitData = {
+            ...form.toAPI(),
+            image: selectedImage.value
+          }
+
+          emit('submit', submitData);
         }
       };
 
@@ -263,13 +323,64 @@
         addIngredient,
         removeIngredient,
         handleSubmit,
-        recipeNutrition
+        recipeNutrition,
+        imagePreview,
+        handleImageSelect,
+        removeImage
       };
     }
   }
   </script>
   
   <style scoped>
+  .image-section {
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .image-preview {
+    position: relative;
+    display: inline-block;
+  }
+
+  .recipe-image {
+    max-width: 500px;
+    max-height: 400px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .remove-image-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .upload-btn {
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 40px 60px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #6b7280;
+    transition: all 0.2s;
+  }
+
+  .upload-btn:hover {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+  }
+
   .recipe-form-container {
     max-width: 1200px;
     margin: 0 auto;

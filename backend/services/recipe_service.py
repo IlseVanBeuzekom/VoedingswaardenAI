@@ -46,5 +46,17 @@ class RecipeService:
             servings=db_recipe.servings,
             preparation_time=db_recipe.preparation_time,
             instructions=db_recipe.instructions,
+            image_url=db_recipe.image_url,
             ingredients=formatted_ingredients
         )
+    
+    def update_recipe_image(self, recipe_id: int, image_url: str) -> Optional[RecipeResponse]:
+        db_recipe = self.recipe_repo.get_recipe_by_id(recipe_id)
+        if not db_recipe:
+            return None
+        
+        db_recipe.image_url = image_url
+        self.recipe_repo.db.commit()
+        self.recipe_repo.db.refresh(db_recipe)
+        
+        return self._format_recipe_response(db_recipe)
