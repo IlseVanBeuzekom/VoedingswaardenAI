@@ -86,9 +86,11 @@
   import { computed } from 'vue';
   import NutritionSummary from './NutritionSummary.vue';
   import recipeService from '../../services/recipeService.js';
+  import BaseButton from './BaseButton.vue';
   
   export default {
     name: 'RecipeCard',
+    components: { BaseButton },
     emits: ['edit', 'delete', 'select'],
     props: {
       recipe: {
@@ -148,9 +150,13 @@
     display: flex;
     gap: 8px;
   }
-  
+  .select-recipe-btn {
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    white-space: nowrap;
+  }
   .action-btn {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(196, 33, 33, 0.9);
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     width: 32px;

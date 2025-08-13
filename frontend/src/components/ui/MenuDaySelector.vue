@@ -79,9 +79,11 @@
   
   <script>
   import { computed, ref, watch } from 'vue';
+  import BaseButton from './BaseButton.vue'
   
   export default {
     name: 'MenuDaySelector',
+    components: { BaseButton },
     emits: ['recipeChange'],
     props: {
       date: {
