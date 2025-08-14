@@ -38,10 +38,13 @@ app.include_router(weekmenu_router)
 app.include_router(shopping_list_router)
 app.include_router(daily_food_router)
 
+
 @app.get("/")
 async def root():
     return {"message": "Nutrition App API is running"}
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

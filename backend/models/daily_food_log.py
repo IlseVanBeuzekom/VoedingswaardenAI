@@ -10,39 +10,47 @@ from models.recipe import RecipeDB
 
 import enum
 
+
 class MealType(enum.Enum):
     ONTBIJT = "ontbijt"
-    LUNCH = "lunch" 
+    LUNCH = "lunch"
     DINER = "diner"
     TUSSENDOORTJE = "tussendoortje"
 
+
 class DailyFoodLogDB(Base):
     __tablename__ = "daily_food_logs"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False, index=True)
-    
+
     # Relationships
-    entries = relationship("DailyFoodEntryDB", back_populates="daily_log", cascade="all, delete-orphan")
+    entries = relationship(
+        "DailyFoodEntryDB", back_populates="daily_log", cascade="all, delete-orphan"
+    )
+
 
 class DailyFoodEntryDB(Base):
     __tablename__ = "daily_food_entries"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     daily_log_id = Column(Integer, ForeignKey("daily_food_logs.id"), nullable=False)
-    
+
     # Either product or recipe (not both)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=True)
     recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=True)
-    
+
     amount = Column(Float, nullable=False)
     unit = Column(String, nullable=False, default="gram")
-    meal_type = Column(String(20), nullable=False, default="tussendoortje") #Column(Enum(MealType), nullable=False, default=MealType.TUSSENDOORTJE)  # NEW
-    
+    meal_type = Column(
+        String(20), nullable=False, default="tussendoortje"
+    )  # Column(Enum(MealType), nullable=False, default=MealType.TUSSENDOORTJE)  # NEW
+
     # Relationships blijven hetzelfde
     daily_log = relationship("DailyFoodLogDB", back_populates="entries")
     product = relationship("ProductDB")
     recipe = relationship("RecipeDB")
+
 
 # Pydantic schemas
 class DailyFoodEntryBase(BaseModel):
@@ -50,28 +58,33 @@ class DailyFoodEntryBase(BaseModel):
     recipe_id: Optional[int] = None
     amount: float = Field(..., gt=0)
     unit: str = Field(..., min_length=1, max_length=50)
-    meal_type: str = "tussendoortje" #Field(..., description="ontbijt, lunch, diner, tussendoortje")
+    meal_type: str = "tussendoortje"  # Field(..., description="ontbijt, lunch, diner, tussendoortje")
+
 
 class DailyFoodEntryCreate(DailyFoodEntryBase):
     pass
+
 
 class DailyFoodEntryResponse(DailyFoodEntryBase):
     id: int
     product: Optional[dict] = None
     recipe: Optional[dict] = None
-    
+
     class Config:
         from_attributes = True
+
 
 class DailyFoodLogBase(BaseModel):
     date: date
 
+
 class DailyFoodLogCreate(DailyFoodLogBase):
     entries: List[DailyFoodEntryCreate] = []
+
 
 class DailyFoodLogResponse(DailyFoodLogBase):
     id: int
     entries: List[DailyFoodEntryResponse] = []
-    
+
     class Config:
         from_attributes = True
