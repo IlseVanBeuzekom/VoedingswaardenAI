@@ -23,7 +23,7 @@ class TestProductModels:
         sample_product_data["name"] = ""
         with pytest.raises(ValidationError) as exc_info:
             ProductCreate(**sample_product_data)
-        assert "at least 1 characters" in str(exc_info.value)
+        assert "String should have at least 1 character" in str(exc_info.value)
 
     def test_product_create_negative_values(self, sample_product_data):
         """Test ProductCreate with negative values"""
