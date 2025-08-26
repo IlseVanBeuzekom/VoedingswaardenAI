@@ -13,7 +13,7 @@ from repositories.product_repository import ProductRepository
 from repositories.recipe_repository import RecipeRepository
 from services.product_service import ProductService
 from services.recipe_service import RecipeService
-
+from datetime import date, timedelta
 
 @pytest.fixture
 def test_db():
@@ -190,4 +190,45 @@ def recipe_ingredient_data(sample_products):
         "product_id": sample_products[0].id,
         "amount": 200.0,
         "unit": "gram"
+    }
+
+@pytest.fixture
+def menu_day_data():
+    """Sample menu day data"""
+    return {
+        "date": date.today(),
+        "recipe_id": 1,
+        "servings": 4,
+        "add_to_shopping_list": True
+    }
+
+@pytest.fixture
+def menu_day_data_no_servings():
+    """Sample menu day data"""
+    return {
+        "date": date.today(),
+        "recipe_id": 1,
+        "add_to_shopping_list": True
+    }
+
+@pytest.fixture
+def week_menu_data():
+    """Sample week menu data"""
+    return {
+        "start_date": date.today(),
+        "end_date": date.today() + timedelta(days=1),
+        "days": [
+            {
+                "date": date.today(),
+                "recipe_id": 1,
+                "servings": 4,
+                "add_to_shopping_list": True
+            },
+            {
+                "date": date.today() + timedelta(days=1),
+                "recipe_id": 2,
+                "servings": 2,
+                "add_to_shopping_list": False
+            }
+        ]
     }
