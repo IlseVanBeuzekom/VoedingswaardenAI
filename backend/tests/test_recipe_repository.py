@@ -1,6 +1,7 @@
 import pytest
 from pytest import mark
 from models.recipe import RecipeCreate, RecipeDB, RecipeIngredientDB, RecipeIngredientCreate
+from sqlalchemy import text
 
 class TestRecipeRepository:
     def test_create_recipe_without_ingredients(self, recipe_repo, sample_products):
@@ -233,12 +234,14 @@ class TestRecipeRepository:
         assert 100.0 in amounts
         assert 50.0 in amounts
 
-    @mark.skip # To be checked when claude is there for help
-    def test_create_recipe_with_invalid_product_id(self, recipe_repo, sample_recipe_data):
+    
+    def test_create_recipe_with_invalid_product_id(self, recipe_repo, sample_recipe_data, test_db):
         """Test creating recipe with non-existing product ID"""
         sample_recipe_data['ingredients'][0]['product_id'] = 999
         print('sample recipe data: ', sample_recipe_data)
         recipe_create = RecipeCreate(**sample_recipe_data)
+
+        test_db.execute(text("PRAGMA foreign_keys=ON"))
 
         # This should raise an exception due to foreign key constraint
         with pytest.raises(Exception):
